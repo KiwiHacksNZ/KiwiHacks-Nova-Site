@@ -2,6 +2,15 @@
 import Layout from "../layouts/Layout.astro";
 import NovaLogo from "../components/NovaLogo.astro";
 import BackButton from "../components/BackButton.astro";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import nikoImg from "../assets/images/team/niko.jpg";
+import sebastianImg from "../assets/images/team/sebastian.jpg";
+import joshImg from "../assets/images/team/josh.jpg";
+import kyleImg from "../assets/images/team/kyle.jpg";
+import christieImg from "../assets/images/team/christie.jpg";
+import maggieImg from "../assets/images/team/maggie.jpg";
+import kieraImg from "../assets/images/team/kiera.jpg";
 
 type TeamLink = {
   label: string;
@@ -10,7 +19,7 @@ type TeamLink = {
 
 type TeamMember = {
   name: string;
-  image: string;
+  image: ImageMetadata;
   bio: string;
   links: TeamLink[];
 };
@@ -33,7 +42,7 @@ const socialIcons: Record<string, string> = {
 const members: TeamMember[] = [
   {
     name: "Niko Purdie",
-    image: "https://www.kiwihacks.org/assets/niko-BSB4MRDU.jpg",
+    image: nikoImg,
     bio: "I’m a 17 year old coder from Sacred Heart College and the lead organiser of KiwiHacks. This is the fourth hackathon I’ve organized for students in Auckland! I’m passionate about both sailing and coding, and I’m super excited to help create an awesome experience for everyone who attends!!",
     links: [
       { label: "Email", href: "mailto:niko@kiwihacks.org" },
@@ -51,7 +60,7 @@ const members: TeamMember[] = [
   },
   {
     name: "Sebastian Johnson",
-    image: "https://www.kiwihacks.org/assets/sebastian-Dci24rUi.jpg",
+    image: sebastianImg,
     bio: "I’m a 15 year old student from Pakuranga College helping out with the website and technical infrastructure for KiwiHacks. I’m passionate about technology, AV, and building cool systems that make events run smoothly. I’m excited to help bring KiwiHacks to life and see the amazing projects people create during the hackathon!",
     links: [
       { label: "Email", href: "mailto:pakkid@stuffandthings.cc" },
@@ -65,7 +74,7 @@ const members: TeamMember[] = [
   },
   {
     name: "Josh Palmer",
-    image: "https://www.kiwihacks.org/assets/josh-HAfF2EQi.jpg",
+    image: joshImg,
     bio: "I’m a 14 year old scout from Selwyn College leading outreach + helping out the website. I’m passionate about coding & learning. I love the thrill of getting a project finally working & I’m super excited to see what people create at KiwiHacks!",
     links: [
       { label: "Email", href: "mailto:josh@kiwihacks.org" },
@@ -78,20 +87,8 @@ const members: TeamMember[] = [
     ],
   },
   {
-    name: "Audrey Shi",
-    image: "https://www.kiwihacks.org/assets/audrey-5AENO453.jpg",
-    bio: "Hey there! I’m a 15 year old coder from Glendowie College, and the Art & Branding lead at KiwiHacks. I have a passion for all sorts of things, including coding, art, and learning. I’m extremely grateful to be a part of the team, and I’m excited to make KiwiHacks an amazing event for all our attendees!",
-    links: [
-      { label: "Email", href: "mailto:audrey@kiwihacks.org" },
-      {
-        label: "LinkedIn",
-        href: "https://www.linkedin.com/in/audrey-shi-0657213b4/",
-      },
-    ],
-  },
-  {
     name: "Kyle Bendall",
-    image: "https://www.kiwihacks.org/assets/kyle-DkGiKs1o.jpg",
+    image: kyleImg,
     bio: "I’m a 16 year old coder from Marcellin College leading website building and helping with outreach. I’m passionate about coding and learning (and playing video games). I’m excited to help people create something cool at KiwiHacks!",
     links: [
       { label: "Email", href: "mailto:kyle@kiwihacks.org" },
@@ -102,7 +99,7 @@ const members: TeamMember[] = [
   },
   {
     name: "Christie Berenshteyn",
-    image: "https://www.kiwihacks.org/assets/christie-BhcpgFV-.jpg",
+    image: christieImg,
     bio: "I’m a Year 11 Glendowie College student helping with outreach and marketing, among other things. Outside of coding, I enjoy playing the piano, baking, learning new things, and leading several school clubs. I’m really excited to make KiwiHacks New Zealand’s BEST hackathon!",
     links: [
       { label: "Email", href: "mailto:christie@kiwihacks.org" },
@@ -111,13 +108,13 @@ const members: TeamMember[] = [
   },
   {
     name: "Maggie Berenshteyn",
-    image: "https://www.kiwihacks.org/assets/maggie-CK6Xw0FP.jpg",
+    image: maggieImg,
     bio: "I’m a 15 year old student from Glendowie College who organises the social media and advertising for KiwiHacks. I’m excited to help spread the word about KiwiHacks to make it a super fun event for everyone!",
     links: [{ label: "Email", href: "mailto:maggie.berenshteyn@gmail.com" }],
   },
   {
     name: "Kiera Langridge",
-    image: "https://www.kiwihacks.org/assets/kiera-PCkvP3kV.jpg",
+    image: kieraImg,
     bio: "I’m a 16 year old student from Baradene College helping out with outreach and branding. I’m passionate about learning, writing, and coding awesome projects. I can’t wait to see what people create at KiwiHacks, and I’m so excited to help bring the event to life!",
     links: [
       { label: "Email", href: "mailto:kiera.langridge@gmail.com" },
@@ -134,7 +131,7 @@ const members: TeamMember[] = [
   title="KiwiHacks Nova | Team"
   description="Meet the KiwiHacks Nova team."
 >
-  <div class="mx-auto max-w-5xl px-5 pt-6 pb-24">
+  <div class="mx-auto max-w-6xl px-5 pt-6 pb-24">
     <BackButton />
 
     <div
@@ -144,14 +141,14 @@ const members: TeamMember[] = [
       <h1 class="text-5xl font-semibold text-white sm:text-7xl">Team</h1>
     </div>
 
-    <section class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <section class="mt-12 flex flex-wrap justify-center gap-6">
       {
         members.map((member) => (
-          <article class="overflow-hidden rounded-xl bg-[#5c2a42]/85 ring-1 ring-white/5">
-            <img
+          <article class="w-full overflow-hidden rounded-xl bg-[#5c2a42]/85 ring-1 ring-white/5 sm:w-[calc(50%-0.75rem)] lg:w-[calc(25%-1.125rem)]">
+            <Image
               src={member.image}
               alt={member.name}
-              class="h-[26rem] w-full rounded-xl bg-[#4b1e36] object-contain p-2 sm:h-[30rem]"
+              class="h-72 w-full rounded-xl bg-[#4b1e36] object-cover"
               loading="lazy"
               draggable="false"
             />
