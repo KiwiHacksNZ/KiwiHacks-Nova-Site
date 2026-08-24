@@ -14,7 +14,7 @@ export type City = {
 export const CITIES: City[] = [
   { name: "Wellington", slug: "wellington", date: "28-29 Sep" },
   { name: "Christchurch", slug: "christchurch", date: "2-3 Oct" },
-  { name: "Auckland", slug: "auckland", date: "10-11 Oct" },
+  { name: "Auckland", slug: "auckland", date: "9-10 Oct" },
 ];
 
 // The home page ("/") defaults to this city.
