@@ -124,7 +124,7 @@ const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
 
 <script>
   import { cityBySlug } from "../data/cities";
-  import { city, readStoredCity, selectCity } from "../state";
+  import { activeCity, city, selectCity } from "../state";
 
   const mobileMenuToggle = document.querySelector<HTMLButtonElement>(
     "[data-mobile-menu-toggle]",
@@ -157,11 +157,10 @@ const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
     if (chevron) chevron.classList.toggle("rotate-180", open);
   }
 
-  // Publish the restored choice into the store before anything subscribes, so
+  // Publish the resolved city into the store before anything subscribes, so
   // every subscriber starts from the city the inline scripts already rendered
-  // rather than briefly seeing the empty initial value.
-  const stored = readStoredCity();
-  if (stored) city.set(stored);
+  // rather than briefly seeing the default.
+  city.set(activeCity());
 
   // Update button label when the city changes.
   city.subscribe((selected) => {

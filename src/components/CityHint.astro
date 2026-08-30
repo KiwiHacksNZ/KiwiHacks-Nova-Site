@@ -1,12 +1,19 @@
 ---
 import { CITIES, DEFAULT_CITY } from "../data/cities";
+
+// slug -> display name, for the inline script that fills the banner in.
+const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
 ---
 
 {
   /*
-  Shown only to visitors who haven't picked a city (see the rule in
-  global.css). Because of that it can name the default city directly: once a
-  choice is made the banner is gone for good.
+  Shown to visitors who haven't picked a city — whether the city came from the
+  IP guess or is just the default (see the rule in global.css). Once a choice is
+  made the banner is gone for good.
+
+  The markup below is written for the default case; the inline script rewrites
+  the city name and the reason when the middleware guessed one. It only ever
+  runs with the banner visible, so there is no no-JS case to cover.
 
   The banner element carries no layout of its own, since the reveal rule sets
   `display: block` on it. Layout lives on the inner wrapper.
@@ -21,9 +28,11 @@ import { CITIES, DEFAULT_CITY } from "../data/cities";
         class="flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:gap-3 sm:text-left"
       >
         <p class="text-white/80">
-          We&apos;ve picked <span class="font-semibold text-white"
-            >{DEFAULT_CITY.name}</span
-          > for you. Nova also runs in the other two cities.
+          We&apos;ve picked <span
+            class="font-semibold text-white"
+            data-city-hint-name>{DEFAULT_CITY.name}</span
+          ><span data-city-hint-reason> for you</span>. Nova also runs in the
+          other two cities.
         </p>
         <button
           type="button"
@@ -58,6 +67,31 @@ import { CITIES, DEFAULT_CITY } from "../data/cities";
     </div>
   </div>
 </div>
+
+{
+  /*
+  Names the city the bootstrap script settled on, and says where it came from,
+  during parse so the default city never flashes.
+*/
+}
+<script is:inline define:vars={{ cityNames: CITY_NAMES }}>
+  (function () {
+    var root = document.documentElement;
+    var reason = root.dataset.cityDefault;
+    // Absent means the visitor picked their city, so this banner is hidden.
+    if (!reason) return;
+
+    var name = cityNames[root.dataset.city];
+    var nameEl = document.querySelector("[data-city-hint-name]");
+    if (name && nameEl) nameEl.textContent = name;
+
+    var reasonEl = document.querySelector("[data-city-hint-reason]");
+    if (reasonEl) {
+      reasonEl.textContent =
+        reason === "detected" ? " based on where you seem to be" : " for you";
+    }
+  })();
+</script>
 
 <script>
   import { cityBySlug } from "../data/cities";

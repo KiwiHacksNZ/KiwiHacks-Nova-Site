@@ -6,19 +6,19 @@ import {
   type City,
 } from "./data/cities";
 
-// The city being shown. Starts as the default; a stored choice replaces it on
-// load, and picking one from the nav or the hint banner sets it for good.
+// The city being shown. Starts as the default; whatever the bootstrap script
+// resolved replaces it on load, and picking one from the nav or the hint banner
+// sets it for good.
 export const city = atom<City>(DEFAULT_CITY);
 
-/** The persisted choice, or null if the visitor hasn't made one. */
-export function readStoredCity(): City | null {
-  try {
-    const slug = localStorage.getItem(CITY_STORAGE_KEY);
-    return (slug && cityBySlug(slug)) || null;
-  } catch {
-    // Private mode / storage disabled — fall back to a per-session choice.
-    return null;
-  }
+/**
+ * The city the inline bootstrap script settled on, read back off <html>. That
+ * script has already weighed the stored choice, the geo cookie and the default,
+ * so this is the one place the rest of the page needs to look.
+ */
+export function activeCity(): City {
+  const slug = document.documentElement.dataset.city;
+  return (slug && cityBySlug(slug)) || DEFAULT_CITY;
 }
 
 /**
