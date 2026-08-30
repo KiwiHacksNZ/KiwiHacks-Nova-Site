@@ -1,10 +1,9 @@
 ---
 import NovaLogo from "./NovaLogo.astro";
 import { CITIES } from "../data/cities";
-import { city } from "../state";
 
-// Current city from state
-const activeCity = city.get();
+// slug -> display name, for the inline label script below.
+const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
 ---
 
 <!-- The bar plus its bright pink gradient underline strip. -->
@@ -62,8 +61,8 @@ const activeCity = city.get();
           aria-expanded="false"
           class="flex w-full items-center justify-center gap-3 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#5b52ee] sm:w-auto sm:px-5 sm:py-2"
         >
-          <span class="truncate whitespace-nowrap">
-            {activeCity.name}
+          <span class="truncate whitespace-nowrap" data-city-label>
+            Select City
           </span>
           <svg
             viewBox="0 0 24 24"
@@ -110,9 +109,22 @@ const activeCity = city.get();
   </div>
 </header>
 
+{
+  /*
+  Sets the label during parse so a restored city never flashes as "Select City".
+*/
+}
+<script is:inline define:vars={{ cityNames: CITY_NAMES }}>
+  (function () {
+    var name = cityNames[document.documentElement.dataset.city];
+    var label = document.querySelector("[data-city-label]");
+    if (name && label) label.textContent = name;
+  })();
+</script>
+
 <script>
-  import { CITIES, cityBySlug } from "../data/cities";
-  import { city } from "../state";
+  import { cityBySlug } from "../data/cities";
+  import { city, readStoredCity, selectCity } from "../state";
 
   const mobileMenuToggle = document.querySelector<HTMLButtonElement>(
     "[data-mobile-menu-toggle]",
@@ -145,11 +157,16 @@ const activeCity = city.get();
     if (chevron) chevron.classList.toggle("rotate-180", open);
   }
 
-  // Update button label when state changes
-  const unsubscribe = city.subscribe((newCity) => {
-    if (!toggle) return;
-    const span = toggle.querySelector("span");
-    if (span) span.textContent = newCity.name;
+  // Publish the restored choice into the store before anything subscribes, so
+  // every subscriber starts from the city the inline scripts already rendered
+  // rather than briefly seeing the empty initial value.
+  const stored = readStoredCity();
+  if (stored) city.set(stored);
+
+  // Update button label when the city changes.
+  city.subscribe((selected) => {
+    const label = toggle?.querySelector("[data-city-label]");
+    if (label) label.textContent = selected ? selected.name : "Select City";
   });
 
   toggle?.addEventListener("click", (e) => {
@@ -167,7 +184,8 @@ const activeCity = city.get();
         if (citySlug) {
           const selectedCity = cityBySlug(citySlug);
           if (selectedCity) {
-            city.set(selectedCity);
+            // Persists the choice and lifts the gate on the landing page.
+            selectCity(selectedCity);
             setOpen(false);
           }
         }

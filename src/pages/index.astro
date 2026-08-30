@@ -1,35 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import CityHome from "../components/CityHome.astro";
-import { DEFAULT_CITY } from "../data/cities";
-import { city as cityState } from "../state";
-
-// Set the default city in state
-cityState.set(DEFAULT_CITY);
+import CityPicker from "../components/CityPicker.astro";
 ---
 
+{
+  /*
+  Both are rendered; the gate CSS in global.css shows exactly one, decided
+  before first paint by the bootstrap script in Layout.astro. Visitors without a
+  stored city see the picker, everyone else goes straight to their city's page.
+*/
+}
 <Layout>
-  <CityHome city={DEFAULT_CITY} />
+  <CityPicker />
+  <CityHome />
 </Layout>
-
-<script>
-  import { city } from "../state";
-
-  // Subscribe to city changes and re-render CityHome
-  city.subscribe((newCity) => {
-    // Update the city name display
-    const cityName = document.querySelector("p.mt-8");
-    if (cityName) {
-      cityName.textContent = `${newCity.name}'s free 24-hour hackathon for high school students`;
-    }
-
-    // Update the pink banner with city name and date
-    const banner = document.querySelector(".bg-\\[\\#aa4176\\]");
-    if (banner) {
-      const p = banner.querySelector("p");
-      if (p) {
-        p.textContent = `${newCity.name}  ·  ${newCity.date}  ·  Location TBC`;
-      }
-    }
-  });
-</script>

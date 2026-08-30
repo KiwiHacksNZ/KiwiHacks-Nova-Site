@@ -17,11 +17,10 @@ export const CITIES: City[] = [
   { name: "Auckland", slug: "auckland", date: "9-10 Oct" },
 ];
 
-// The home page ("/") defaults to this city.
-export const DEFAULT_CITY_SLUG = "auckland";
+// localStorage key holding the slug of the city the visitor picked.
+// Read by the inline bootstrap script in Layout.astro before first paint.
+export const CITY_STORAGE_KEY = "selectedCity";
 
 export function cityBySlug(slug: string): City | undefined {
   return CITIES.find((c) => c.slug === slug);
 }
-
-export const DEFAULT_CITY = cityBySlug(DEFAULT_CITY_SLUG)!;

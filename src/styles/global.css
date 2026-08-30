@@ -69,3 +69,24 @@ body {
   paint-order: stroke fill;
   filter: drop-shadow(2px 3px 0 rgba(17, 20, 58, 0.9));
 }
+
+/*
+ * City gate. The landing page asks visitors to pick a city before it shows any
+ * city-specific content. The inline bootstrap script in Layout.astro sets
+ * `data-city` (a choice was restored) or `data-city-pick` (none yet) on <html>
+ * before first paint, so neither state flashes.
+ *
+ * With JavaScript off, neither attribute is ever set: the gate stays hidden and
+ * the page renders its city-neutral copy, which is also what crawlers see.
+ */
+[data-city-gate] {
+  display: none;
+}
+
+html[data-city-pick] [data-city-gate] {
+  display: block;
+}
+
+html[data-city-pick] [data-city-content] {
+  display: none;
+}

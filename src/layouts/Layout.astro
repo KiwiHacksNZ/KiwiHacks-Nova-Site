@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import NavBar from "../components/NavBar.astro";
 import Footer from "../components/Footer.astro";
+import { CITIES, CITY_STORAGE_KEY } from "../data/cities";
 
 interface Props {
   title?: string;
@@ -14,6 +15,8 @@ const {
   description = "Nova: New Zealand's free 24-hour hackathon for high school students, by KiwiHacks.",
   ogImage = "/nova-logo.png",
 } = Astro.props;
+
+const CITY_SLUGS = CITIES.map((c) => c.slug);
 
 const canonicalURL = new URL(
   Astro.url.pathname,
@@ -41,33 +44,29 @@ const canonicalURL = new URL(
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(ogImage, canonicalURL)} />
-    <script>
-      // Restore city selector label from localStorage immediately to prevent flash
-      const savedCity = localStorage.getItem("selectedCity");
-      if (savedCity) {
-        const cityNames = {
-          wellington: "Wellington",
-          christchurch: "Christchurch",
-          auckland: "Auckland",
-        };
-        const cityName = cityNames[savedCity];
-        if (cityName) {
-          const observer = new MutationObserver(() => {
-            const toggle = document.querySelector("[data-city-toggle]");
-            if (toggle) {
-              const span = toggle.querySelector("span");
-              if (span && span.textContent !== cityName) {
-                span.textContent = cityName;
-              }
-              observer.disconnect();
-            }
-          });
-          observer.observe(document.documentElement, {
-            childList: true,
-            subtree: true,
-          });
+    {
+      /*
+      Runs before first paint so the city gate never flashes: stamps <html>
+      with the restored city, or marks the page as needing a choice.
+    */
+    }
+    <script
+      is:inline
+      define:vars={{ storageKey: CITY_STORAGE_KEY, slugs: CITY_SLUGS }}
+    >
+      (function () {
+        var slug = null;
+        try {
+          slug = localStorage.getItem(storageKey);
+        } catch (e) {
+          // Storage blocked — treat as "no choice yet".
         }
-      }
+        if (slug && slugs.indexOf(slug) !== -1) {
+          document.documentElement.dataset.city = slug;
+        } else {
+          document.documentElement.dataset.cityPick = "";
+        }
+      })();
     </script>
   </head>
   <body class="flex min-h-full flex-col">

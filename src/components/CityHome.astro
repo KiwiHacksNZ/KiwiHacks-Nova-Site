@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import { SIGNUP_URL, type City } from "../data/cities";
+import { CITIES, SIGNUP_URL } from "../data/cities";
 import heroLogo from "../assets/images/Kiwihacks_-_Nova_Logo_2.png";
 import img1 from "../assets/images/DSCF3841.jpg";
 import img2 from "../assets/images/DSCF4012.jpg";
@@ -9,12 +9,25 @@ import img4 from "../assets/images/DSCF3768.jpg";
 import img5 from "../assets/images/DSCF3771.jpg";
 import img6 from "../assets/images/DSCF7194.jpg";
 
-const { city } = Astro.props;
-
+// No city prop: which city this renders for is only known in the browser, from
+// the visitor's stored choice. The markup ships city-neutral copy (what
+// crawlers and no-JS visitors see) and the script below fills in the city.
 const galleryImages = [img1, img2, img3, img4, img5, img6];
+
+// slug -> the two strings the browser swaps in once the city is known.
+const CITY_COPY = Object.fromEntries(
+  CITIES.map((c) => [
+    c.slug,
+    {
+      name: c.name,
+      banner: `${c.name}\u00a0 ·\u00a0 ${c.date}\u00a0 ·\u00a0 Location TBC`,
+    },
+  ]),
+);
 ---
 
 <div
+  data-city-content
   class="mx-auto flex max-w-5xl flex-col items-center px-5 pt-16 pb-24 text-center sm:pt-24"
 >
   <Image
@@ -28,7 +41,8 @@ const galleryImages = [img1, img2, img3, img4, img5, img6];
   />
 
   <p class="mt-8 max-w-2xl text-xl text-white sm:text-2xl">
-    {city.name}&apos;s free 24-hour hackathon for high school students
+    <span data-city-name>New Zealand</span>&apos;s free 24-hour hackathon for
+    high school students
   </p>
 
   <div
@@ -36,11 +50,9 @@ const galleryImages = [img1, img2, img3, img4, img5, img6];
   >
     <p
       class="text-lg font-semibold uppercase tracking-wide text-white sm:text-2xl"
+      data-city-banner
     >
-      {city.name}
-      {"  ·  "}
-      {city.date}
-      {"  ·  "}Location TBC
+      Wellington&nbsp; ·&nbsp; Christchurch&nbsp; ·&nbsp; Auckland
     </p>
   </div>
 
@@ -176,6 +188,39 @@ const galleryImages = [img1, img2, img3, img4, img5, img6];
     </div>
   </section>
 </div>
+
+{
+  /*
+  Fills in the chosen city during parse, before the browser paints, so the
+  city-neutral fallback copy above is never visible to a visitor who has
+  already picked. Later changes from the nav are handled by the module script.
+*/
+}
+<script is:inline define:vars={{ cityCopy: CITY_COPY }}>
+  (function () {
+    var copy = cityCopy[document.documentElement.dataset.city];
+    if (!copy) return;
+    var name = document.querySelector("[data-city-name]");
+    if (name) name.textContent = copy.name;
+    var banner = document.querySelector("[data-city-banner]");
+    if (banner) banner.textContent = copy.banner;
+  })();
+</script>
+
+<script>
+  import { city } from "../state";
+
+  // Keep the hero copy in sync when the city is changed from the nav.
+  city.subscribe((selected) => {
+    if (!selected) return;
+    const name = document.querySelector("[data-city-name]");
+    if (name) name.textContent = selected.name;
+    const banner = document.querySelector("[data-city-banner]");
+    if (banner) {
+      banner.textContent = `${selected.name}\u00a0 ·\u00a0 ${selected.date}\u00a0 ·\u00a0 Location TBC`;
+    }
+  });
+</script>
 
 <script>
   document.querySelectorAll<HTMLElement>("[data-carousel]").forEach((root) => {
