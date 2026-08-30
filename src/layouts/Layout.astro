@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import NavBar from "../components/NavBar.astro";
 import Footer from "../components/Footer.astro";
-import { CITIES, CITY_STORAGE_KEY } from "../data/cities";
+import { CITIES, CITY_STORAGE_KEY, DEFAULT_CITY_SLUG } from "../data/cities";
 
 interface Props {
   title?: string;
@@ -46,13 +46,18 @@ const canonicalURL = new URL(
     <meta name="twitter:image" content={new URL(ogImage, canonicalURL)} />
     {
       /*
-      Runs before first paint so the city gate never flashes: stamps <html>
-      with the restored city, or marks the page as needing a choice.
+      Runs before first paint so nothing flashes: stamps <html> with the city to
+      show, plus `data-city-default` when that is only the default rather than
+      something the visitor picked. The hint banner keys off the latter.
     */
     }
     <script
       is:inline
-      define:vars={{ storageKey: CITY_STORAGE_KEY, slugs: CITY_SLUGS }}
+      define:vars={{
+        storageKey: CITY_STORAGE_KEY,
+        slugs: CITY_SLUGS,
+        defaultSlug: DEFAULT_CITY_SLUG,
+      }}
     >
       (function () {
         var slug = null;
@@ -64,7 +69,8 @@ const canonicalURL = new URL(
         if (slug && slugs.indexOf(slug) !== -1) {
           document.documentElement.dataset.city = slug;
         } else {
-          document.documentElement.dataset.cityPick = "";
+          document.documentElement.dataset.city = defaultSlug;
+          document.documentElement.dataset.cityDefault = "";
         }
       })();
     </script>

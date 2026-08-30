@@ -1,0 +1,89 @@
+---
+import { CITIES, DEFAULT_CITY } from "../data/cities";
+---
+
+{
+  /*
+  Shown only to visitors who haven't picked a city (see the rule in
+  global.css). Because of that it can name the default city directly: once a
+  choice is made the banner is gone for good.
+
+  The banner element carries no layout of its own, since the reveal rule sets
+  `display: block` on it. Layout lives on the inner wrapper.
+*/
+}
+<div data-city-hint>
+  <div class="mx-auto max-w-5xl px-5 pt-5">
+    <div
+      class="rounded-2xl bg-white/8 px-4 py-3 text-sm ring-1 ring-white/15 sm:px-5"
+    >
+      <div
+        class="flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:gap-3 sm:text-left"
+      >
+        <p class="text-white/80">
+          We&apos;ve picked <span class="font-semibold text-white"
+            >{DEFAULT_CITY.name}</span
+          > for you. Nova also runs in the other two cities.
+        </p>
+        <button
+          type="button"
+          data-city-hint-toggle
+          aria-expanded="false"
+          aria-controls="city-hint-options"
+          class="shrink-0 rounded-lg px-2 py-1 font-semibold text-[#ff8ec2] underline underline-offset-2 transition-colors hover:text-[#ffa9d1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+        >
+          See the others
+        </button>
+      </div>
+
+      <div
+        id="city-hint-options"
+        data-city-hint-options
+        hidden
+        class="mt-3 flex flex-wrap justify-center gap-2 border-t border-white/10 pt-3"
+      >
+        {
+          CITIES.map((city) => (
+            <button
+              type="button"
+              data-city-hint-select={city.slug}
+              class="rounded-xl bg-[#4f46e5] px-4 py-2 text-white transition-colors hover:bg-[#5b52ee] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            >
+              <span class="font-semibold">{city.name}</span>
+              <span class="ml-2 text-xs text-white/70">{city.date}</span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { cityBySlug } from "../data/cities";
+  import { selectCity } from "../state";
+
+  const toggle = document.querySelector<HTMLButtonElement>(
+    "[data-city-hint-toggle]",
+  );
+  const options = document.querySelector<HTMLElement>(
+    "[data-city-hint-options]",
+  );
+
+  toggle?.addEventListener("click", () => {
+    if (!options) return;
+    const open = options.hidden;
+    options.hidden = !open;
+    toggle.setAttribute("aria-expanded", String(open));
+  });
+
+  // Picking here persists the choice, which also hides this banner.
+  document
+    .querySelectorAll<HTMLButtonElement>("[data-city-hint-select]")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const picked = cityBySlug(btn.dataset.cityHintSelect ?? "");
+        if (picked) selectCity(picked);
+      });
+    });
+</script>

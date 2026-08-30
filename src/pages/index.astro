@@ -1,17 +1,18 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import CityHome from "../components/CityHome.astro";
-import CityPicker from "../components/CityPicker.astro";
+import CityHint from "../components/CityHint.astro";
+import { DEFAULT_CITY } from "../data/cities";
 ---
 
 {
   /*
-  Both are rendered; the gate CSS in global.css shows exactly one, decided
-  before first paint by the bootstrap script in Layout.astro. Visitors without a
-  stored city see the picker, everyone else goes straight to their city's page.
+  Renders the default city. A stored choice is swapped in before first paint by
+  the inline scripts; visitors without one get the CityHint banner offering the
+  other cities.
 */
 }
 <Layout>
-  <CityPicker />
-  <CityHome />
+  <CityHint />
+  <CityHome city={DEFAULT_CITY} />
 </Layout>

@@ -71,22 +71,18 @@ body {
 }
 
 /*
- * City gate. The landing page asks visitors to pick a city before it shows any
- * city-specific content. The inline bootstrap script in Layout.astro sets
- * `data-city` (a choice was restored) or `data-city-pick` (none yet) on <html>
- * before first paint, so neither state flashes.
+ * City hint banner. Visitors who haven't picked a city see the default one plus
+ * a banner offering the others; the inline bootstrap script in Layout.astro
+ * sets `data-city-default` on <html> before first paint, so the banner never
+ * flashes in or out.
  *
- * With JavaScript off, neither attribute is ever set: the gate stays hidden and
- * the page renders its city-neutral copy, which is also what crawlers see.
+ * With JavaScript off the attribute is never set, so the banner stays hidden
+ * and the page is just the default city — which is also what crawlers see.
  */
-[data-city-gate] {
+[data-city-hint] {
   display: none;
 }
 
-html[data-city-pick] [data-city-gate] {
+html[data-city-default] [data-city-hint] {
   display: block;
-}
-
-html[data-city-pick] [data-city-content] {
-  display: none;
 }

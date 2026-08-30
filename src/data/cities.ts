@@ -21,6 +21,18 @@ export const CITIES: City[] = [
 // Read by the inline bootstrap script in Layout.astro before first paint.
 export const CITY_STORAGE_KEY = "selectedCity";
 
+// Shown to visitors who haven't picked a city, alongside a banner offering the
+// other two. A stored choice always wins over this.
+export const DEFAULT_CITY_SLUG = "auckland";
+
 export function cityBySlug(slug: string): City | undefined {
   return CITIES.find((c) => c.slug === slug);
+}
+
+export const DEFAULT_CITY = cityBySlug(DEFAULT_CITY_SLUG)!;
+
+// The hero banner line, used both at build time and by the inline script that
+// swaps in a stored city.
+export function cityBannerText(city: City): string {
+  return `${city.name}  ·  ${city.date}  ·  Location TBC`;
 }

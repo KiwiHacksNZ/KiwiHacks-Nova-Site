@@ -1,6 +1,6 @@
 ---
 import NovaLogo from "./NovaLogo.astro";
-import { CITIES } from "../data/cities";
+import { CITIES, DEFAULT_CITY } from "../data/cities";
 
 // slug -> display name, for the inline label script below.
 const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
@@ -62,7 +62,7 @@ const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
           class="flex w-full items-center justify-center gap-3 rounded-xl bg-[#4f46e5] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#5b52ee] sm:w-auto sm:px-5 sm:py-2"
         >
           <span class="truncate whitespace-nowrap" data-city-label>
-            Select City
+            {DEFAULT_CITY.name}
           </span>
           <svg
             viewBox="0 0 24 24"
@@ -111,7 +111,7 @@ const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
 
 {
   /*
-  Sets the label during parse so a restored city never flashes as "Select City".
+  Sets the label during parse so a stored city never flashes as the default one.
 */
 }
 <script is:inline define:vars={{ cityNames: CITY_NAMES }}>
@@ -166,7 +166,7 @@ const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
   // Update button label when the city changes.
   city.subscribe((selected) => {
     const label = toggle?.querySelector("[data-city-label]");
-    if (label) label.textContent = selected ? selected.name : "Select City";
+    if (label) label.textContent = selected.name;
   });
 
   toggle?.addEventListener("click", (e) => {
@@ -184,7 +184,7 @@ const CITY_NAMES = Object.fromEntries(CITIES.map((c) => [c.slug, c.name]));
         if (citySlug) {
           const selectedCity = cityBySlug(citySlug);
           if (selectedCity) {
-            // Persists the choice and lifts the gate on the landing page.
+            // Persists the choice, which also hides the hint banner.
             selectCity(selectedCity);
             setOpen(false);
           }
