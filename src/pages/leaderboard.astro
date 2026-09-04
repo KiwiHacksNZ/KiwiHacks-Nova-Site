@@ -1,0 +1,102 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BackButton from "../components/BackButton.astro";
+import Leaderboard from "../components/Leaderboard.astro";
+import { SIGNUP_URL } from "../data/cities";
+
+const STEPS: { label: string; title: string; body: string }[] = [
+  {
+    label: "01",
+    title: "Sign up for Nova",
+    body: "Fill in the form once. We'll email you your own referral code. It looks like KIW-A1B2C.",
+  },
+  {
+    label: "02",
+    title: "Send it to a mate",
+    body: "Anyone in years 9 to 13 anywhere in Aotearoa. They paste your code in the “Who referred you?” box when they sign up.",
+  },
+  {
+    label: "03",
+    title: "Watch yourself climb",
+    body: "Their sign-up lands on your count, and your name turns up on this page. No cap on how many friends you bring.",
+  },
+];
+---
+
+<Layout
+  title="Beacons Leaderboard | KiwiHacks Nova"
+  description="The Nova Beacons leaderboard: who's brought the most people to KiwiHacks Nova. Share your referral code and climb the list."
+>
+  <div class="mx-auto max-w-4xl px-5 pt-6 pb-24">
+    <BackButton />
+
+    <h1 class="mt-8 text-5xl font-semibold text-white sm:text-6xl">
+      Leaderboard
+    </h1>
+
+    <p class="mt-8 max-w-2xl text-lg leading-relaxed text-white/85 sm:text-xl">
+      Every person who signs up with your referral code moves you up this list.
+      That&apos;s the whole game. Bring a friend, bring your whole class. Nova
+      is better when the room is full.
+    </p>
+
+    <div class="mt-7 flex flex-wrap items-center gap-4">
+      <a
+        href={SIGNUP_URL}
+        class="inline-flex min-h-11 items-center rounded-2xl bg-[#4f46e5] px-8 py-3.5 text-base font-semibold text-white no-underline shadow-lg transition-colors hover:bg-[#5b52ee] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#ff7ab3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0d28]"
+      >
+        Sign up and get your code
+      </a>
+      <p class="text-sm text-white/65">
+        Free, and you can bring friends later.
+      </p>
+    </div>
+
+    <Leaderboard />
+
+    {/* How it works */}
+    <section aria-labelledby="how-heading" class="mt-20">
+      <h2 id="how-heading" class="text-3xl text-white sm:text-4xl">
+        How referrals work
+      </h2>
+
+      <ol class="mt-6 space-y-4">
+        {
+          STEPS.map((step) => (
+            <li class="flex gap-4 rounded-2xl bg-[#5c2a42]/85 p-5 ring-1 ring-white/5 sm:gap-5 sm:p-6">
+              <span
+                class="font-mono text-lg font-bold tabular-nums text-[#db74a8]"
+                aria-hidden="true"
+              >
+                {step.label}
+              </span>
+              <div class="min-w-0">
+                <h3 class="text-lg font-semibold text-white">{step.title}</h3>
+                <p class="mt-1.5 text-base leading-relaxed text-white/80">
+                  {step.body}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p class="mt-6 max-w-2xl text-sm leading-relaxed text-white/60">
+        Only your display name and your referral count are ever shown here.
+        Emails and referral codes stay private. Lost your code, or think a
+        sign-up hasn&apos;t counted? Email
+        <a
+          href="mailto:niko@kiwihacks.org"
+          class="text-[#ff9ecb] underline underline-offset-4 hover:text-white"
+          >niko@kiwihacks.org</a
+        > and we&apos;ll sort it.
+      </p>
+
+      <p class="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+        Want your name sniped from the leaderboard? Email the same address and
+        we&apos;ll take it off. Your referrals still count, you just won&apos;t
+        show up here.
+      </p>
+    </section>
+  </div>
+</Layout>

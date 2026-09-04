@@ -1,0 +1,470 @@
+---
+/*
+ * The live Nova referral leaderboard.
+ *
+ * Fetched in the browser rather than at build time: the numbers move all
+ * through the sign-up window, and the Beacons backend already allows this
+ * site's origin, so there is nothing to proxy. That does mean the list needs
+ * real loading, error and empty states, which are the four <div>s below.
+ * Exactly one is ever visible.
+ *
+ * Names come from strangers on the internet, so every one of them is written
+ * with textContent. Nothing from the API is ever parsed as HTML.
+ */
+---
+
+<section aria-labelledby="leaderboard-heading" class="mt-16">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <h2 id="leaderboard-heading" class="text-3xl text-white sm:text-4xl">
+      The list
+    </h2>
+
+    <div class="flex items-center gap-3">
+      <p
+        class="font-mono text-xs tracking-wide text-white/55 tabular-nums"
+        data-lb-checked
+      >
+        checking&hellip;
+      </p>
+      <button
+        type="button"
+        data-lb-refresh
+        class="inline-flex min-h-11 items-center gap-2 rounded-xl border-2 border-dashed border-white/35 px-4 py-2 text-sm font-semibold text-white transition-colors hover:border-[#ff7ab3] hover:bg-white/5 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#ff7ab3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0d28] disabled:cursor-not-allowed disabled:border-white/20 disabled:text-white/60"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          class="h-4 w-4"
+          aria-hidden="true"
+          data-lb-refresh-icon
+        >
+          <path
+            d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+        <span data-lb-refresh-label>Refresh</span>
+      </button>
+    </div>
+  </div>
+
+  {/* Announces the outcome of each load to screen readers. */}
+  <p class="sr-only" role="status" aria-live="polite" data-lb-live></p>
+
+  {/* ---- Loading ---------------------------------------------------- */}
+  <div data-lb-state="loading" class="mt-6" aria-hidden="true">
+    <ul class="overflow-hidden rounded-2xl bg-[#141838] ring-1 ring-white/10">
+      {
+        [0, 1, 2, 3, 4].map((i) => (
+          <li class="flex items-center gap-4 border-t border-white/10 px-4 py-4 first:border-t-0">
+            <span class="h-4 w-6 rounded bg-white/10 motion-safe:animate-pulse" />
+            <span
+              class="h-4 flex-1 rounded bg-white/10 motion-safe:animate-pulse"
+              style={`max-width: ${[9, 7, 8, 6, 7][i]}rem`}
+            />
+            <span class="h-4 w-16 rounded bg-white/10 motion-safe:animate-pulse" />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  {/* ---- Error ------------------------------------------------------ */}
+  <div data-lb-state="error" hidden class="mt-6">
+    <div
+      class="rounded-2xl border-2 border-dashed border-[#f5a3a3] bg-[#4a1f2e] px-5 py-6 sm:px-7"
+    >
+      <p class="flex items-center gap-2 text-lg font-semibold text-[#ffc9c9]">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          class="h-5 w-5 shrink-0"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 8v5m0 3.5v.01M10.3 3.9 2.6 17.3A2 2 0 0 0 4.3 20.3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+        The leaderboard didn&apos;t load
+      </p>
+      <p class="mt-2 max-w-prose text-base leading-relaxed text-white/85">
+        The scores live on our Beacons server, and it didn&apos;t answer just
+        then. Your spot is safe, and nothing is lost. Give it another go, and if
+        it keeps failing, tell us in the
+        <a
+          href="https://www.kiwihacks.org/discord"
+          class="text-[#ff9ecb] underline underline-offset-4 hover:text-white"
+          >KiwiHacks Discord</a
+        >.
+      </p>
+      <p
+        class="mt-3 font-mono text-xs break-words text-white/50"
+        data-lb-error-detail
+      >
+      </p>
+      <button
+        type="button"
+        data-lb-retry
+        class="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#4f46e5] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#5b52ee] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#ff7ab3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0d28]"
+      >
+        Try again
+      </button>
+    </div>
+  </div>
+
+  {/* ---- Empty ------------------------------------------------------ */}
+  <div data-lb-state="empty" hidden class="mt-6">
+    <div
+      class="rounded-2xl border-2 border-dashed border-white/25 bg-white/5 px-5 py-10 text-center sm:px-8"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        class="mx-auto h-10 w-10 text-[#ffd166]"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 2.6l2.6 6.1 6.6.55-5 4.33 1.5 6.45L12 16.6l-5.7 3.43 1.5-6.45-5-4.33 6.6-.55L12 2.6z"
+        ></path>
+      </svg>
+      <p class="mt-4 text-xl text-white">Nobody&apos;s on the board yet.</p>
+      <p class="mx-auto mt-2 max-w-md text-base leading-relaxed text-white/80">
+        Be the first. Sign up, grab your referral code, and send it to one
+        friend. You&apos;ll show up here as soon as they join.
+      </p>
+    </div>
+  </div>
+
+  {/* ---- Ready ------------------------------------------------------ */}
+  <div data-lb-state="ready" hidden>
+    <ol
+      id="leaderboard-list"
+      data-lb-list
+      class="mt-6 overflow-hidden rounded-2xl bg-[#141838] ring-1 ring-white/10"
+    >
+    </ol>
+
+    {/* Only rendered when there is actually something folded away. */}
+    <button
+      type="button"
+      data-lb-show-all
+      hidden
+      aria-expanded="false"
+      aria-controls="leaderboard-list"
+      class="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl border-2 border-dashed border-white/35 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:border-[#ff7ab3] hover:bg-white/5 focus-visible:ring-3 focus-visible:ring-[#ff7ab3] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0d28] focus-visible:outline-none sm:w-auto"
+    >
+      <span data-lb-show-all-label></span>
+    </button>
+
+    <p class="mt-3 font-mono text-xs leading-relaxed text-white/45">
+      Only people with at least one referral appear here.
+    </p>
+
+    {/* Running total across the whole board, plus a line about it. */}
+    <div
+      class="mt-6 rounded-2xl border-2 border-dashed border-white/25 bg-white/5 px-5 py-7 text-center sm:px-8"
+    >
+      <p
+        class="font-mono text-5xl font-bold tabular-nums text-white sm:text-6xl"
+        data-lb-total
+      >
+      </p>
+      <p class="mt-1 text-base text-white/75" data-lb-total-label></p>
+      <p
+        class="mt-4 font-mono text-sm text-[#ff9ecb] sm:text-base"
+        data-lb-hype
+      >
+      </p>
+    </div>
+  </div>
+
+  {
+    /*
+    Band template: one place, its score, and everyone holding it. Cloned per
+    band and filled with textContent. The rank tint is applied through the
+    data-top attribute and the scoped styles below.
+  */
+  }
+  <template data-lb-band-template>
+    <li class="border-t border-white/10 px-4 py-4 first:border-t-0 sm:px-5">
+      <div class="flex items-center justify-between gap-4">
+        <p
+          class="flex items-center gap-1.5 font-mono text-sm font-semibold"
+          data-lb-place
+        >
+          <svg
+            viewBox="0 0 24 24"
+            class="lb-star hidden h-3.5 w-3.5 shrink-0"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 2.6l2.6 6.1 6.6.55-5 4.33 1.5 6.45L12 16.6l-5.7 3.43 1.5-6.45-5-4.33 6.6-.55L12 2.6z"
+            ></path>
+          </svg>
+          <span data-lb-rank></span>
+        </p>
+        <p class="shrink-0 text-right whitespace-nowrap">
+          <span
+            class="font-mono text-lg font-semibold tabular-nums text-white"
+            data-lb-count></span>
+          <span class="ml-1.5 text-sm text-white/60" data-lb-label></span>
+        </p>
+      </div>
+      <ul class="mt-2.5 flex flex-wrap gap-1.5" data-lb-names></ul>
+    </li>
+  </template>
+
+  <template data-lb-name-template>
+    <li
+      class="rounded-lg bg-white/8 px-2.5 py-1 text-base break-words text-white sm:text-lg"
+    >
+    </li>
+  </template>
+</section>
+
+<style>
+  /* The top three scores get a warmer place label; everyone else is calm. */
+  [data-lb-place] {
+    color: rgb(255 255 255 / 0.5);
+  }
+  [data-top] [data-lb-place] {
+    color: #ffd166;
+  }
+  /* Star and wash on the leading band only. A tie at the top is one band, so
+     it gets one star however many people share it. */
+  [data-top="1"] .lb-star {
+    display: block;
+  }
+  /* The leading band wears the pink the highlight card used to. */
+  [data-top="1"] {
+    background: #aa4176;
+  }
+  /* Muted greys are unreadable on that pink, so lift them for this band. */
+  [data-top="1"] [data-lb-label] {
+    color: rgb(255 255 255 / 0.9);
+  }
+  [data-top="1"] [data-lb-names] li {
+    background: rgb(255 255 255 / 0.22);
+  }
+</style>
+
+<script>
+  import { LEADERBOARD_URL, toBands } from "../data/beacons";
+  import type { LeaderboardEntry } from "../data/beacons";
+  import { hypeLine } from "../data/leaderboard-lines";
+
+  const root = document.querySelector<HTMLElement>(
+    "[aria-labelledby='leaderboard-heading']",
+  );
+  if (root) setup(root);
+
+  function setup(root: HTMLElement) {
+    const panels = new Map<string, HTMLElement>(
+      Array.from(root.querySelectorAll<HTMLElement>("[data-lb-state]")).map(
+        (el) => [el.dataset.lbState!, el],
+      ),
+    );
+    const list = root.querySelector<HTMLOListElement>("[data-lb-list]")!;
+    const bandTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-lb-band-template]",
+    )!;
+    const nameTemplate = root.querySelector<HTMLTemplateElement>(
+      "[data-lb-name-template]",
+    )!;
+    const live = root.querySelector<HTMLElement>("[data-lb-live]")!;
+    const checked = root.querySelector<HTMLElement>("[data-lb-checked]")!;
+    const refresh = root.querySelector<HTMLButtonElement>("[data-lb-refresh]")!;
+    const refreshLabel = root.querySelector<HTMLElement>(
+      "[data-lb-refresh-label]",
+    )!;
+    const refreshIcon = root.querySelector<SVGElement>(
+      "[data-lb-refresh-icon]",
+    )!;
+    const errorDetail = root.querySelector<HTMLElement>(
+      "[data-lb-error-detail]",
+    )!;
+    const showAll =
+      root.querySelector<HTMLButtonElement>("[data-lb-show-all]")!;
+    const showAllLabel = root.querySelector<HTMLElement>(
+      "[data-lb-show-all-label]",
+    )!;
+
+    // How many places the list shows before it folds. Everything past this is
+    // rendered but hidden, and the button below the list reveals it.
+    const VISIBLE_PLACES = 10;
+
+    // Purely the visitor's choice, kept across refreshes. Whether anything is
+    // actually folded is a separate question, answered by placeCount, so a
+    // short board can never leave this stuck on.
+    let expanded = false;
+    let placeCount = 0;
+
+    function applyFold() {
+      const foldable = placeCount > VISIBLE_PLACES;
+      const showEverything = expanded || !foldable;
+
+      // Direct children only: the name chips inside a band are <li> as well.
+      Array.from(list.children).forEach((band, index) => {
+        (band as HTMLElement).hidden =
+          !showEverything && index >= VISIBLE_PLACES;
+      });
+
+      showAll.hidden = !foldable;
+      showAll.setAttribute("aria-expanded", String(expanded));
+      showAllLabel.textContent = expanded
+        ? "Show fewer"
+        : `Show all ${placeCount} places`;
+    }
+
+    showAll.addEventListener("click", () => {
+      expanded = !expanded;
+      applyFold();
+    });
+
+    function show(state: "loading" | "error" | "empty" | "ready") {
+      panels.forEach((el, name) => {
+        el.hidden = name !== state;
+      });
+    }
+
+    const plural = (n: number) => (n === 1 ? "referral" : "referrals");
+
+    // 1st, 2nd, 3rd, 4th, including the 11th/12th/13th exceptions.
+    function ordinal(n: number): string {
+      const tens = n % 100;
+      if (tens >= 11 && tens <= 13) return `${n}th`;
+      return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+    }
+
+    // "Ana", "Ana and Bo", "Ana, Bo and Cy".
+    function joinNames(names: string[]): string {
+      if (names.length < 2) return names[0] ?? "";
+      return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+    }
+
+    function render(entries: LeaderboardEntry[]) {
+      if (entries.length === 0) {
+        show("empty");
+        live.textContent = "No one has referred anyone yet.";
+        return;
+      }
+
+      const bands = toBands(entries);
+
+      list.replaceChildren();
+
+      bands.forEach((band, index) => {
+        const fragment = bandTemplate.content.cloneNode(
+          true,
+        ) as DocumentFragment;
+        const li = fragment.querySelector("li")!;
+
+        // Indexed by band, not by rank: the third-best score is still a medal
+        // place even when two people shared second and its rank is 4.
+        if (index < 3) li.dataset.top = String(index + 1);
+
+        li.querySelector("[data-lb-rank]")!.textContent = ordinal(band.rank);
+        li.querySelector("[data-lb-count]")!.textContent = String(
+          band.referralCount,
+        );
+        li.querySelector("[data-lb-label]")!.textContent = plural(
+          band.referralCount,
+        );
+
+        const names = li.querySelector("[data-lb-names]")!;
+        for (const displayName of band.names) {
+          const chip = nameTemplate.content.cloneNode(true) as DocumentFragment;
+          // API values are rendered as text, never markup.
+          chip.querySelector("li")!.textContent = displayName;
+          names.append(chip);
+        }
+
+        list.append(fragment);
+      });
+
+      placeCount = bands.length;
+      applyFold();
+
+      // Every referral on the board is one person who signed up because
+      // somebody asked them to, so the counts sum to the total sign-ups the
+      // referral scheme brought in.
+      const total = entries.reduce((sum, e) => sum + e.referralCount, 0);
+      root.querySelector<HTMLElement>("[data-lb-total]")!.textContent =
+        String(total);
+      root.querySelector<HTMLElement>("[data-lb-total-label]")!.textContent =
+        total === 1 ? "sign-up from referrals" : "sign-ups from referrals";
+      // Re-rolled on every render, so the line changes on reload and refresh.
+      root.querySelector<HTMLElement>("[data-lb-hype]")!.textContent =
+        hypeLine(total);
+
+      show("ready");
+      live.textContent = `Leaderboard updated. ${entries.length} ${
+        entries.length === 1 ? "person is" : "people are"
+      } on the board, led by ${joinNames(bands[0].names)}.`;
+    }
+
+    let inFlight = false;
+
+    async function load(isRetry: boolean) {
+      if (inFlight) return;
+      inFlight = true;
+
+      refresh.disabled = true;
+      refreshLabel.textContent = "Refreshing…";
+      refreshIcon.classList.add("motion-safe:animate-spin");
+      if (isRetry) show("loading");
+
+      try {
+        const res = await fetch(LEADERBOARD_URL, {
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) throw new Error(`the server replied ${res.status}`);
+
+        const data: unknown = await res.json();
+        if (!Array.isArray(data)) throw new Error("unexpected response shape");
+
+        render(
+          data.filter(
+            (e): e is LeaderboardEntry =>
+              !!e &&
+              typeof e.displayName === "string" &&
+              typeof e.referralCount === "number",
+          ),
+        );
+        checked.textContent = `last checked ${new Date().toLocaleTimeString(
+          [],
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+          },
+        )}`;
+      } catch (err) {
+        show("error");
+        errorDetail.textContent = `error: ${
+          err instanceof Error ? err.message : "could not reach the leaderboard"
+        }`;
+        checked.textContent = "couldn't reach the server";
+        live.textContent =
+          "The leaderboard didn't load. Use the try again button to retry.";
+      } finally {
+        inFlight = false;
+        refresh.disabled = false;
+        refreshLabel.textContent = "Refresh";
+        refreshIcon.classList.remove("motion-safe:animate-spin");
+      }
+    }
+
+    refresh.addEventListener("click", () => load(true));
+    root
+      .querySelector<HTMLButtonElement>("[data-lb-retry]")
+      ?.addEventListener("click", () => load(true));
+
+    load(false);
+  }
+</script>
