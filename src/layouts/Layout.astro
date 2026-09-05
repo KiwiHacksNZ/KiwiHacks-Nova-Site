@@ -105,5 +105,9 @@ const canonicalURL = new URL(
       <slot />
     </main>
     <Footer />
+    <script>
+      import { injectSpeedInsights } from "@vercel/speed-insights";
+      injectSpeedInsights();
+    </script>
   </body>
 </html>
