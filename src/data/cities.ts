@@ -8,13 +8,29 @@ export type City = {
   // URL slug, e.g. "/auckland".
   slug: string;
   date: string;
+  location: string;
 };
 
 // Dropdown order.
 export const CITIES: City[] = [
-  { name: "Wellington", slug: "wellington", date: "28-29 Sep" },
-  { name: "Christchurch", slug: "christchurch", date: "2-3 Oct" },
-  { name: "Auckland", slug: "auckland", date: "10-11 Oct" },
+  {
+    name: "Wellington",
+    slug: "wellington",
+    date: "28-29 Sep",
+    location: "Victoria University of Wellington",
+  },
+  {
+    name: "Christchurch",
+    slug: "christchurch",
+    date: "2-3 Oct",
+    location: "Partly HQ, Christchurch Central",
+  },
+  {
+    name: "Auckland",
+    slug: "auckland",
+    date: "10-11 Oct",
+    location: "MIT Ngā Kete Wānanga Marae, Ōtara",
+  },
 ];
 
 // The home page ("/") defaults to this city.
